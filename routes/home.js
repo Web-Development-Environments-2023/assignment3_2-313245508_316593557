@@ -12,12 +12,7 @@ const recipe_utils = require("./utils/recipes_utils");
  * This path returns the home page
  */
  router.get("/", async (req, res, next) => {
-    try {
-      const recipe = await recipes_utils.getRecipeDetails(req.params.recipeId);
-      res.send(recipe);
-    } catch (error) {
-      next(error);
-    }
+
   });
 
 
@@ -26,10 +21,5 @@ const recipe_utils = require("./utils/recipes_utils");
  * This path returns the about page
  */
  router.get("/about", async (req, res, next) => {
-    try {
-      const recipe = await recipes_utils.getRecipeDetails(req.params.recipeId);
-      res.send(recipe);
-    } catch (error) {
-      next(error);
-    }
+
   });

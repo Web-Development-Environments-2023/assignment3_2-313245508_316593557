@@ -42,7 +42,7 @@ router.get('/favorites', async (req,res,next) => {
   try{
     const user_id = req.session.user_id;
     let favorite_recipes = {};
-    const recipes_id = await user_utils.getFavoriteRecipes("oryory2");
+    const recipes_id = await user_utils.getFavoriteRecipes(user_id);
     let recipes_id_array = [];
     recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
     const results = await recipe_utils.getRecipesPreview(recipes_id_array);
@@ -51,6 +51,39 @@ router.get('/favorites', async (req,res,next) => {
     next(error); 
   }
 });
+
+
+
+/**
+ * This path gets body with recipeId and save this recipe in the favorites list of the logged-in user
+ */
+ router.post('/private', async (req,res,next) => {
+
+})
+
+/**
+ * This path returns the favorites recipes that were saved by the logged-in user
+ */
+router.get('/private', async (req,res,next) => {
+
+});
+
+
+
+/**
+ * This path gets body with recipeId and save this recipe in the favorites list of the logged-in user
+ */
+ router.post('/familty', async (req,res,next) => {
+
+})
+
+/**
+ * This path returns the favorites recipes that were saved by the logged-in user
+ */
+router.get('/familty', async (req,res,next) => {
+
+});
+
 
 
 
