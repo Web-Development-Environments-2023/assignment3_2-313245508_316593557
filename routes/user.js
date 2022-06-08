@@ -28,6 +28,8 @@ router.post('/favorites', async (req,res,next) => {
   try{
     const user_id = req.session.user_id;
     const recipe_id = req.body.recipeId;
+    console.log(user_id)
+    console.log(recipe_id)
     await user_utils.markAsFavorite(user_id,recipe_id);
     res.status(200).send("The Recipe successfully saved as favorite");
     } catch(error){
@@ -73,14 +75,14 @@ router.get('/private', async (req,res,next) => {
 /**
  * This path gets body with recipeId and save this recipe in the favorites list of the logged-in user
  */
- router.post('/familty', async (req,res,next) => {
+ router.post('/family', async (req,res,next) => {
 
 })
 
 /**
  * This path returns the favorites recipes that were saved by the logged-in user
  */
-router.get('/familty', async (req,res,next) => {
+router.get('/family', async (req,res,next) => {
 
 });
 

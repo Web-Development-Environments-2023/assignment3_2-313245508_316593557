@@ -2,7 +2,32 @@ var express = require("express");
 var router = express.Router();
 const recipes_utils = require("./utils/recipes_utils");
 
+
 router.get("/", (req, res) => res.send("im here"));
+
+
+
+/**
+ * This path gets a query and returns some recipies
+ */
+ router.get("/search", async (req, res, next) => {
+  try {
+    const query = req.params.query;
+    const number = req.params.number;
+    const cuisine = req.params.cuisine;
+    const diet = req.params.diet;
+    const intolerances = req.params.intolerances;
+
+    const recipes = await recipes_utils.searchRecipes(query, number, cuisine, diet, intolerances);
+    res.send(recipes.data);
+  } catch (error) {
+    next(error);
+  }
+
+});
+
+
+
 
 
 /**
@@ -18,14 +43,6 @@ router.get("/:recipeId", async (req, res, next) => {
 });
 
 
-/**
- * This path gets a query and returns some recipies
- */
- router.get("/search/{query}", async (req, res, next) => {
-
-});
-
-
 
 
 /**
@@ -34,6 +51,7 @@ router.get("/:recipeId", async (req, res, next) => {
  router.post('/recipe/createRecipe', async (req,res,next) => {
 
 })
+
 
 
 
