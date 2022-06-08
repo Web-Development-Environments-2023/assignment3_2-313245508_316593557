@@ -12,11 +12,12 @@ router.get("/", (req, res) => res.send("im here"));
  */
  router.get("/search", async (req, res, next) => {
   try {
-    const query = req.params.query;
-    const number = req.params.number;
-    const cuisine = req.params.cuisine;
-    const diet = req.params.diet;
-    const intolerances = req.params.intolerances;
+
+    const query = req.query.query;
+    const number = req.query.number;
+    const cuisine = req.query.cuisine;
+    const diet = req.query.diet;
+    const intolerances = req.query.intolerances;
 
     const recipes = await recipes_utils.searchRecipes(query, number, cuisine, diet, intolerances);
     res.send(recipes.data);

@@ -40,6 +40,7 @@ async function getRecipeDetails(recipe_id) {
 
 
  async function searchRecipes(query, number, cuisine, diet, intolerances) {
+
         let res = await axios.get(`${api_domain}/complexSearch`, {
             params: {
                 // includeNutrition: false,

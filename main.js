@@ -46,6 +46,8 @@ const corsConfig = {
   credentials: true
 };
 
+
+
 app.use(cors(corsConfig));
 app.options("*", cors(corsConfig));
 
@@ -102,3 +104,10 @@ process.on("SIGINT", function () {
   }
   process.exit();
 });
+
+
+
+
+// params : url/3141612
+// query : url?query=abc&number=5
+// body : url (arguments in body)
