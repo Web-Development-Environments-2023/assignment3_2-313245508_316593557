@@ -47,7 +47,7 @@ router.get("/:recipeId", async (req, res, next) => {
 
 
 /**
- * This path gets gets details about a new recipie and add it to the website
+ * This path gets details about a new recipe and adds it to the website
  */
  router.post('/recipe/createRecipe', async (req,res,next) => {
 
