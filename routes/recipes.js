@@ -1,6 +1,8 @@
 var express = require("express");
 var router = express.Router();
 const recipes_utils = require("./utils/recipes_utils");
+const users_utils = require("./utils/user_utils");
+
 
 
 router.get("/", (req, res) => res.send("im here"));
@@ -37,23 +39,12 @@ router.get("/", (req, res) => res.send("im here"));
 router.get("/:recipeId", async (req, res, next) => {
   try {
     const recipe = await recipes_utils.getRecipeDetails(req.params.recipeId);
+    await users_utils.markAsWatched(req.session.user_id, req.params.recipeId);
     res.send(recipe);
   } catch (error) {
     next(error);
   }
 });
-
-
-
-
-/**
- * This path gets details about a new recipe and adds it to the website
- */
- router.post('/recipe/createRecipe', async (req,res,next) => {
-
-})
-
-
 
 
 

@@ -1,5 +1,8 @@
 const axios = require("axios");
 const api_domain = "https://api.spoonacular.com/recipes";
+const user_utils = require("./user_utils");
+
+
 
 
 
@@ -38,9 +41,8 @@ async function getRecipeDetails(recipe_id) {
 }
 
 // Function that returns the recipe information of a recipe.
-// @@@@ We need to create a table of watched recipes and checks if he has watched the recipe@@@@@
 // @@@@ I dont know why, but it only returns the first recipe when I try to send multiple recipe_ids
-async function getRecipesPreview(recipes_id_array) {
+async function getRecipesPreview(user_id, recipes_id_array) {
     let results = []
 
     let recipe_info_list =  await axios.get(`${api_domain}/informationBulk`, {
@@ -64,25 +66,32 @@ async function getRecipesPreview(recipes_id_array) {
             glutenFree: glutenFree,
         }
     
-        // // Checks if the user has saved the recipe to his favorite
-        // const is_saved_to_favorites = await user_utils.isFavorite(user_id, recipe_id);
-        // if (is_saved_to_favorites)
-        // {
-        //     preview_dict[favorite] = True
-        // }
-        // else
-        // {
-        //     preview_dict[favorite] = False
-        // }
+        // Checks if the user has saved the recipe to his favorite
+        const is_saved_to_favorites = await user_utils.isFavorite(user_id, id);
+        if (is_saved_to_favorites)
+        {
+            preview_dict['favorite'] = true;
+        }
+        else
+        {
+            preview_dict['favorite'] = false;
+        }
+
+        // Checks if the recipe has been watched by the user
+        const is_watched = await user_utils.isWatched(user_id, id);
+        if (is_watched)
+        {
+            preview_dict['watched'] = true;
+        }
+        else
+        {
+            preview_dict['watched'] = false;
+        }
 
         // Adds the preview dictionnary to the result array
         results.push(preview_dict)
-
-    return results
     }
-
-    
-    
+    return results
 }
 
 // http://localhost:3000/users/hello1?recipeID=715538,716429
@@ -104,8 +113,6 @@ async function getRecipesPreview(recipes_id_array) {
         })
         return res;
 }
-
-
 
 
 exports.getRecipeDetails = getRecipeDetails;
