@@ -47,12 +47,31 @@ router.get('/favorites', async (req,res,next) => {
     const recipes_id = await user_utils.getFavoriteRecipes(user_id);
     let recipes_id_array = [];
     recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
-    const results = await recipe_utils.getRecipesPreview(recipes_id_array);
+    let recipes_id_str = await joinList(recipes_id_array);
+    const results = await recipe_utils.getRecipesPreview(user_id, recipes_id_str);
     res.status(200).send(results);
   } catch(error){
     next(error); 
   }
 });
+
+
+async function joinList(recipes_id_array)
+{
+  let recipes_id_str = "";
+  for (var i = 0; i < recipes_id_array.length; i++)
+  {
+    if(i != recipes_id_array.length - 1)
+    {
+      recipes_id_str += recipes_id_array[i] + ",";
+    }
+    else
+    {
+      recipes_id_str += recipes_id_array[i];
+    }
+  }
+  return recipes_id_str
+}
 
 
 
@@ -89,10 +108,7 @@ router.get('/favorites', async (req,res,next) => {
 router.get('/private', async (req,res,next) => {
   try{
     const user_id = req.session.user_id;
-    const recipes_id = await user_utils.getPrivateRecipes(user_id);
-    let recipes_id_array = [];
-    recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
-    const results = await recipe_utils.getRecipesPreview(recipes_id_array);
+    const results = await recipe_utils.getPrivateRecipesPreview(user_id);
     res.status(200).send(results);
   } catch(error){
     next(error); 
@@ -104,6 +120,7 @@ router.get('/private', async (req,res,next) => {
 router.get('/testGetRecipePreview', async (req,res,next) => {
   try{
     const recipeID = req.query.recipeID
+    console.log(typeof recipeID);
     const results = await recipe_utils.getRecipesPreview(req.session.user_id ,recipeID)
     res.status(200).send(results)
   }catch(error){
@@ -145,6 +162,7 @@ module.exports = router;
 
 // 1. check all paths
 // 2. check the types in the DataBase, and increase VarChars len
-// 3. *getPreviewPrivate
-// 4. 
-// 5. change the Yaml 
+// 3. change the Yaml 
+
+// done - changed the getRecipePreview, and now the getFavorites working (checked)
+// done - created getPrivateRecipePreview, and now the getPrivate working - need to fix the binnary values..

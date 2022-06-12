@@ -1,6 +1,7 @@
 const axios = require("axios");
 const api_domain = "https://api.spoonacular.com/recipes";
 const user_utils = require("./user_utils");
+const DButils = require("./DButils");
 
 
 
@@ -42,9 +43,9 @@ async function getRecipeDetails(recipe_id) {
 
 // Function that returns the recipe information of a recipe.
 // @@@@ I dont know why, but it only returns the first recipe when I try to send multiple recipe_ids
-async function getRecipesPreview(user_id, recipes_id_array) {
+async function getRecipesPreview(user_id, recipes_id_array) 
+{
     let results = []
-
     let recipe_info_list =  await axios.get(`${api_domain}/informationBulk`, {
         params: {
             ids: recipes_id_array,
@@ -57,6 +58,7 @@ async function getRecipesPreview(user_id, recipes_id_array) {
     {
         let {id, image, title, preparationMinutes, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_prev
         let preview_dict =  {
+            recipe_id: id,
             image: image,
             title: title,
             readyInMinutes: preparationMinutes,
@@ -94,8 +96,49 @@ async function getRecipesPreview(user_id, recipes_id_array) {
     return results
 }
 
-// http://localhost:3000/users/hello1?recipeID=715538,716429
 
+
+// Function that returns the recipe information of a recipe.
+async function getPrivateRecipesPreview(user_id) 
+{
+    let results = []
+    let recipe_info_list =  await DButils.execQuery(`select * from private_recipes where user_id=${user_id}`);
+    if(recipe_info_list == [])
+    {
+        return results;
+    }
+    
+    
+    // Loop through all the recipe information that has returned from Spoonacular and extract only the  preview
+    for (let recipe_prev of recipe_info_list)
+    {
+        console.log(recipe_prev)
+        
+        let preview_dict =  {
+            recipe_id: recipe_prev['recipe_id'],
+            favorite: recipe_prev['favorite'],//
+            gluten_free: recipe_prev['gluten_free'],//
+            image: recipe_prev['image'],
+            name: recipe_prev['name'],
+            popularity: recipe_prev['popularity'],
+            preparation_time: recipe_prev['preparation_time'],
+            vegan: recipe_prev['vegan'],//
+            watched: recipe_prev['watched'],//
+            vegetarian: recipe_prev['vegetarian'],//
+        }
+        console.log(preview_dict['favorite'].values())
+
+        // if(preview_dict['favorite']['data'][0] == 48)
+        //     favorite['favorite'] = '0';
+        // else
+        //     favorite['favorite'] = '1';
+        
+
+        // Adds the preview dictionnary to the result array
+        results.push(preview_dict);
+    }
+    return results;
+}
 
 
  async function searchRecipes(query, number, cuisine, diet, intolerances) {
@@ -115,9 +158,9 @@ async function getRecipesPreview(user_id, recipes_id_array) {
 }
 
 
+
 exports.getRecipeDetails = getRecipeDetails;
 exports.searchRecipes = searchRecipes;
 exports.getRecipesPreview = getRecipesPreview;
-
-
+exports.getPrivateRecipesPreview = getPrivateRecipesPreview;
 
