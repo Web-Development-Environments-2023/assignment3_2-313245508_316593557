@@ -20,7 +20,7 @@ router.get("/", (req, res) => res.send("im here"));
     const cuisine = req.query.cuisine;
     const diet = req.query.diet;
     const intolerances = req.query.intolerances;
-
+    await users_utils.addQuerySearchedByUser(query);
     const recipes = await recipes_utils.searchRecipes(query, number, cuisine, diet, intolerances);
     res.send(recipes.data);
   } catch (error) {

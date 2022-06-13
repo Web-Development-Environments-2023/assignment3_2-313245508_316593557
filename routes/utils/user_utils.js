@@ -20,7 +20,6 @@ async function getFamilyRecipes(user_id){
 }
 
 // Function that checks if a user has saved a recipe_id to his favorite - returns a boolean value
-// @@@@ I did not check that this function works yet@@@@@
 async function isFavorite(user_id, recipe_id){
     const count_of_recipes = await DButils.execQuery(`select count(*) from favorite_recipes where user_id=${user_id} and recipe_id=${recipe_id}`);
     if (count_of_recipes > 0){
@@ -61,7 +60,7 @@ async function getLastWatched(user_id)
     let lst = []
     for(let i = 0; i <3; i++)
     {
-        lst.push(recipes[i][recipe_id]);
+        lst.push(recipes[i]['recipe_id']);
     }
     return lst;
 }
@@ -77,6 +76,31 @@ async function isWatched(user_id, recipe_id){
     }
 }
 
+// Function that add a query search to a table in the DB
+async function addQuerySearchedByUser(query)
+{
+    try 
+    {
+      if (req.session && req.session.user_id)
+      {
+
+        const users = await DButils.execQuery("SELECT user_id FROM users")
+          if (users.find((x) => x.user_id === req.session.user_id)) 
+          {
+            req.user_id = req.session.user_id;
+            await DButils.execQuery(`insert into users_searched_queries (user_id, query) values(${req.user_id}, '${query}'))`)
+          }
+      }
+    }
+    catch (error)
+    {
+      next(error);
+    }
+   
+}
+
+
+
 
 exports.markAsFavorite = markAsFavorite;
 exports.getFavoriteRecipes = getFavoriteRecipes;
@@ -87,4 +111,6 @@ exports.createRecipe = createRecipe;
 exports.markAsWatched = markAsWatched;
 exports.getLastWatched = getLastWatched;
 exports.isWatched = isWatched;
+exports.addQuerySearchedByUser = addQuerySearchedByUser;
+
 

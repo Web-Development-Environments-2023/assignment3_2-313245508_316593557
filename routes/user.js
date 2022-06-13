@@ -43,11 +43,10 @@ router.post('/favorites', async (req,res,next) => {
 router.get('/favorites', async (req,res,next) => {
   try{
     const user_id = req.session.user_id;
-    let favorite_recipes = {};
     const recipes_id = await user_utils.getFavoriteRecipes(user_id);
     let recipes_id_array = [];
     recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
-    let recipes_id_str = await joinList(recipes_id_array);
+    let recipes_id_str = await recipe_utils.joinList(recipes_id_array);
     const results = await recipe_utils.getRecipesPreview(user_id, recipes_id_str);
     res.status(200).send(results);
   } catch(error){
@@ -147,8 +146,6 @@ router.get('/family', async (req,res,next) => {
   }
 });
 
-
-
 module.exports = router;
 
 
@@ -161,8 +158,4 @@ module.exports = router;
 
 
 // 1. check all paths
-// 2. check the types in the DataBase, and increase VarChars len
 // 3. change the Yaml 
-
-// done - changed the getRecipePreview, and now the getFavorites working (checked)
-// done - created getPrivateRecipePreview, and now the getPrivate working - need to fix the binnary values..

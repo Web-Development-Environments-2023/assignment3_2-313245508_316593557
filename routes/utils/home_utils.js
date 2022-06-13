@@ -12,8 +12,18 @@ async function getRandomRecipes() {
             number: 3,
         },
     })
-    return res;
+
+    let recipes_id_list = [];
+    for (let recipe of res.data)
+    {
+        let {id} = recipe
+        recipes_id_list.push(id);
+    }
+    
+    return await recipe_utils.getRecipesPreview(req.session.user_id, await recipe_utils.joinList(lastWatched)); ;
 }
+
+
 
 
 

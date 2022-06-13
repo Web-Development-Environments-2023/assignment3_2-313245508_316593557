@@ -26,7 +26,7 @@ async function getRecipeInformation(recipe_id) {
 
 async function getRecipeDetails(recipe_id) {
     let recipe_info = await getRecipeInformation(recipe_id);
-    let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_info.data;
+    let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree, amount_of_meals, ingredients, instructions, type_of_food } = recipe_info.data;
 
     return {
         id: id,
@@ -36,29 +36,33 @@ async function getRecipeDetails(recipe_id) {
         popularity: aggregateLikes,
         vegan: vegan,
         vegetarian: vegetarian,
-        glutenFree: glutenFree,
-        
+        amount_of_meals: amount_of_meals,
+        ingredients: ingredients,
+        instructions: instructions,
+        type_of_food: type_of_food,
     }
 }
 
 // Function that returns the recipe information of a recipe.
 // @@@@ I dont know why, but it only returns the first recipe when I try to send multiple recipe_ids
-async function getRecipesPreview(user_id, recipes_id_array) 
+async function getRecipesPreview(recipes_id_array) 
 {
-    let results = []
-    let recipe_info_list =  await axios.get(`${api_domain}/informationBulk`, {
-        params: {
-            ids: recipes_id_array,
-            apiKey: process.env.spooncular_apiKey
-        }
-    })
+    try
+    {
+        let results = []
+        let recipe_info_list =  await axios.get(`${api_domain}/informationBulk`, {
+            params: {
+                ids: recipes_id_array,
+                apiKey: process.env.spooncular_apiKey
+            }
+        })
+    
 
     // Loop through all the recipe information that has returned from Spoonacular and extract only the  preview
     for (let recipe_prev of recipe_info_list.data)
     {
         let {id, image, title, preparationMinutes, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_prev
         let preview_dict =  {
-            recipe_id: id,
             image: image,
             title: title,
             readyInMinutes: preparationMinutes,
@@ -67,27 +71,42 @@ async function getRecipesPreview(user_id, recipes_id_array)
             vegetarian: vegetarian,
             glutenFree: glutenFree,
         }
-    
-        // Checks if the user has saved the recipe to his favorite
-        const is_saved_to_favorites = await user_utils.isFavorite(user_id, id);
-        if (is_saved_to_favorites)
-        {
-            preview_dict['favorite'] = true;
-        }
-        else
-        {
-            preview_dict['favorite'] = false;
-        }
 
-        // Checks if the recipe has been watched by the user
-        const is_watched = await user_utils.isWatched(user_id, id);
-        if (is_watched)
+
+        if (req.session && req.session.user_id)
         {
-            preview_dict['watched'] = true;
+  
+          const users = await DButils.execQuery("SELECT user_id FROM users")
+            if (users.find((x) => x.user_id === req.session.user_id)) 
+            {
+                        // Checks if the user has saved the recipe to his favorite
+                const is_saved_to_favorites = await user_utils.isFavorite(req.session.user_id, id);
+                if (is_saved_to_favorites)
+                {
+                    preview_dict['favorite'] = true;
+                }
+                else
+                {
+                    preview_dict['favorite'] = false;
+                }
+
+                // Checks if the recipe has been watched by the user
+                const is_watched = await user_utils.isWatched(req.session.user_id, id);
+                if (is_watched)
+                {
+                    preview_dict['watched'] = true;
+                }
+                else
+                {
+                    preview_dict['watched'] = false;
+                }
+                        
+            }
         }
         else
         {
             preview_dict['watched'] = false;
+            preview_dict['favorite'] = false;
         }
 
         // Adds the preview dictionnary to the result array
@@ -95,6 +114,32 @@ async function getRecipesPreview(user_id, recipes_id_array)
     }
     return results
 }
+catch
+{
+    console.log("err");
+}
+
+}
+
+
+
+async function joinList(recipes_id_array)
+{
+  let recipes_id_str = "";
+  for (var i = 0; i < recipes_id_array.length; i++)
+  {
+    if(i != recipes_id_array.length - 1)
+    {
+      recipes_id_str += recipes_id_array[i] + ",";
+    }
+    else
+    {
+      recipes_id_str += recipes_id_array[i];
+    }
+  }
+  return recipes_id_str
+}
+
 
 
 
@@ -115,26 +160,16 @@ async function getPrivateRecipesPreview(user_id)
         console.log(recipe_prev)
         
         let preview_dict =  {
-            recipe_id: recipe_prev['recipe_id'],
-            favorite: recipe_prev['favorite'],//
-            gluten_free: recipe_prev['gluten_free'],//
+            favorite: recipe_prev['favorite'],
+            gluten_free: recipe_prev['gluten_free'],
             image: recipe_prev['image'],
             name: recipe_prev['name'],
             popularity: recipe_prev['popularity'],
             preparation_time: recipe_prev['preparation_time'],
-            vegan: recipe_prev['vegan'],//
-            watched: recipe_prev['watched'],//
-            vegetarian: recipe_prev['vegetarian'],//
+            vegan: recipe_prev['vegan'],
+            watched: recipe_prev['watched'],
+            vegetarian: recipe_prev['vegetarian'],
         }
-        console.log(preview_dict['favorite'].values())
-
-        // if(preview_dict['favorite']['data'][0] == 48)
-        //     favorite['favorite'] = '0';
-        // else
-        //     favorite['favorite'] = '1';
-        
-
-        // Adds the preview dictionnary to the result array
         results.push(preview_dict);
     }
     return results;
@@ -163,4 +198,4 @@ exports.getRecipeDetails = getRecipeDetails;
 exports.searchRecipes = searchRecipes;
 exports.getRecipesPreview = getRecipesPreview;
 exports.getPrivateRecipesPreview = getPrivateRecipesPreview;
-
+exports.joinList = joinList;

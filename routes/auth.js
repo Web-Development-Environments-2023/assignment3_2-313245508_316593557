@@ -16,7 +16,6 @@ router.post("/Register", async (req, res, next) => {
       country: req.body.country,
       password: req.body.password,
       email: req.body.email,
-      // profilePic: req.body.profilePic
     }
     let users = [];
     users = await DButils.execQuery("SELECT username from users");
@@ -40,7 +39,16 @@ router.post("/Register", async (req, res, next) => {
 });
 
 router.post("/Login", async (req, res, next) => {
+
+
+
   try {
+    if (req.session && req.session.user_id)
+    {
+      res.send({ success: false, status: 201, message: "You can't login because there is already a connected user"});
+      return;
+    }
+
     // check that username exists
     const users = await DButils.execQuery("SELECT username FROM users");
     if (!users.find((x) => x.username === req.body.username))
@@ -67,9 +75,30 @@ router.post("/Login", async (req, res, next) => {
   }
 });
 
-router.post("/Logout", function (req, res) {
-  req.session.reset(); // reset the session info --> send cookie when  req.session == undefined!!
-  res.send({ success: true, message: "logout succeeded" });
+router.post("/Logout", async (req, res) => {
+
+  try 
+    {
+      if (req.session && req.session.user_id)
+      {
+
+        const users = await DButils.execQuery("SELECT user_id FROM users")
+          if (users.find((x) => x.user_id === req.session.user_id)) 
+          {
+            req.session.reset(); // reset the session info --> send cookie when  req.session == undefined!!
+            res.send({ success: true, message: "logout succeeded" });
+          }
+      }
+      else
+      {
+        res.send({ success: false, message: "You can't logout because there is no user logged in"});
+      }
+
+    }
+    catch (error)
+    {
+      res.send({ success: false, message: "An error occured during logout"});
+    }
 });
 
 module.exports = router;
