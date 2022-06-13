@@ -1,16 +1,16 @@
 const DButils = require("./DButils");
 
 async function markAsFavorite(user_id, recipe_id){
-    await DButils.execQuery(`insert into favorite_recipes values ('${user_id}',${recipe_id})`);
+    await DButils.execQuery(`insert into favorite_recipes (user_id, recipe_id) values(${user_id},${recipe_id})`);
 }
 
 async function getFavoriteRecipes(user_id){
-    const recipes_id = await DButils.execQuery(`select recipe_id from favorite_recipes where user_id='${user_id}'`);
+    const recipes_id = await DButils.execQuery(`select recipe_id from favorite_recipes where user_id=${user_id}`);
     return recipes_id;
 }
 
 async function getPrivateRecipes(user_id){
-    const recipes_id = await DButils.execQuery(`select recipe_id from private_recipes where user_id='${user_id}'`);
+    const recipes_id = await DButils.execQuery(`select recipe_id from private_recipes where user_id=${user_id}`);
     return recipes_id;
 }
 
@@ -77,26 +77,34 @@ async function isWatched(user_id, recipe_id){
 }
 
 // Function that add a query search to a table in the DB
-async function addQuerySearchedByUser(query)
+async function addQuerySearchedByUser(session, query)
 {
     try 
     {
-      if (req.session && req.session.user_id)
+      if (session && session.user_id)
       {
-
-        const users = await DButils.execQuery("SELECT user_id FROM users")
-          if (users.find((x) => x.user_id === req.session.user_id)) 
+         const users = await DButils.execQuery("SELECT user_id FROM users")
+          if (users.find((x) => x.user_id === session.user_id)) 
           {
-            req.user_id = req.session.user_id;
-            await DButils.execQuery(`insert into users_searched_queries (user_id, query) values(${req.user_id}, '${query}'))`)
+            let user_id = session.user_id;
+            await DButils.execQuery(`insert into users_searched_queries (user_id, query) values(${user_id}, '${query}')`)
           }
       }
     }
     catch (error)
     {
-      next(error);
+        console.log("err");
     }
    
+}
+
+
+// Function that checks if a user watched the recipe
+async function getPrivateRecipeDetails(user_id, recipe_id)
+{
+    const columns = "recipe_id, name, preparation_time, image, popularity, vegan, vegetarian, amount_of_meals, ingredients, instructions, type_of_food, gluten_free, favorite, watched";
+    const recipe_details = await DButils.execQuery(`select ` + columns + ` from private_recipes where user_id=${user_id} and recipe_id=${recipe_id}`);
+    return recipe_details;
 }
 
 
@@ -112,5 +120,5 @@ exports.markAsWatched = markAsWatched;
 exports.getLastWatched = getLastWatched;
 exports.isWatched = isWatched;
 exports.addQuerySearchedByUser = addQuerySearchedByUser;
-
+exports.getPrivateRecipeDetails = getPrivateRecipeDetails;
 

@@ -20,13 +20,12 @@ router.get("/", (req, res) => res.send("im here"));
     const cuisine = req.query.cuisine;
     const diet = req.query.diet;
     const intolerances = req.query.intolerances;
-    await users_utils.addQuerySearchedByUser(query);
-    const recipes = await recipes_utils.searchRecipes(query, number, cuisine, diet, intolerances);
-    res.send(recipes.data);
+    await users_utils.addQuerySearchedByUser(req.session, query);
+    const recipes = await recipes_utils.searchRecipes(req, query, number, cuisine, diet, intolerances);
+    res.send(recipes);
   } catch (error) {
     next(error);
   }
-
 });
 
 
@@ -38,13 +37,15 @@ router.get("/", (req, res) => res.send("im here"));
  */
 router.get("/:recipeId", async (req, res, next) => {
   try {
-    const recipe = await recipes_utils.getRecipeDetails(req.params.recipeId);
+
+    const recipe = await recipes_utils.getRecipeDetails(req, req.params.recipeId);
     await users_utils.markAsWatched(req.session.user_id, req.params.recipeId);
     res.send(recipe);
   } catch (error) {
     next(error);
   }
 });
+
 
 
 

@@ -2,6 +2,7 @@ const axios = require("axios");
 const api_domain = "https://api.spoonacular.com/recipes";
 const user_utils = require("./user_utils");
 const DButils = require("./DButils");
+const e = require("express");
 
 
 
@@ -24,11 +25,10 @@ async function getRecipeInformation(recipe_id) {
 
 
 
-async function getRecipeDetails(recipe_id) {
+async function getRecipeDetails(req, recipe_id) {
     let recipe_info = await getRecipeInformation(recipe_id);
     let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree, amount_of_meals, ingredients, instructions, type_of_food } = recipe_info.data;
-
-    return {
+    preview_dict = {
         id: id,
         title: title,
         readyInMinutes: readyInMinutes,
@@ -40,12 +40,49 @@ async function getRecipeDetails(recipe_id) {
         ingredients: ingredients,
         instructions: instructions,
         type_of_food: type_of_food,
+        glutenFree: glutenFree,
+    
     }
+    if (req.session && req.session.user_id)
+    {
+        const users = await DButils.execQuery("SELECT user_id FROM users")
+        if (users.find((x) => x.user_id === req.session.user_id)) 
+        {
+                    // Checks if the user has saved the recipe to his favorite
+            const is_saved_to_favorites = await user_utils.isFavorite(req.session.user_id, id);
+            if (is_saved_to_favorites)
+            {
+                preview_dict['favorite'] = true;
+            }
+            else
+            {
+                preview_dict['favorite'] = false;
+            }
+
+            // Checks if the recipe has been watched by the user
+            const is_watched = await user_utils.isWatched(req.session.user_id, id);
+            if (is_watched)
+            {
+                preview_dict['watched'] = true;
+            }
+            else
+            {
+                preview_dict['watched'] = false;
+            }
+                    
+        }
+    }
+    else
+    {
+        preview_dict['watched'] = false;
+        preview_dict['favorite'] = false;
+    }
+    return preview_dict;
 }
 
 // Function that returns the recipe information of a recipe.
 // @@@@ I dont know why, but it only returns the first recipe when I try to send multiple recipe_ids
-async function getRecipesPreview(recipes_id_array) 
+async function getRecipesPreview(req, recipes_id_array) 
 {
     try
     {
@@ -56,6 +93,8 @@ async function getRecipesPreview(recipes_id_array)
                 apiKey: process.env.spooncular_apiKey
             }
         })
+
+    console.log(1);
     
 
     // Loop through all the recipe information that has returned from Spoonacular and extract only the  preview
@@ -71,6 +110,9 @@ async function getRecipesPreview(recipes_id_array)
             vegetarian: vegetarian,
             glutenFree: glutenFree,
         }
+
+        console.log(2);
+
 
 
         if (req.session && req.session.user_id)
@@ -90,6 +132,9 @@ async function getRecipesPreview(recipes_id_array)
                     preview_dict['favorite'] = false;
                 }
 
+                console.log(3);
+
+
                 // Checks if the recipe has been watched by the user
                 const is_watched = await user_utils.isWatched(req.session.user_id, id);
                 if (is_watched)
@@ -100,6 +145,9 @@ async function getRecipesPreview(recipes_id_array)
                 {
                     preview_dict['watched'] = false;
                 }
+
+                console.log(4);
+
                         
             }
         }
@@ -176,20 +224,37 @@ async function getPrivateRecipesPreview(user_id)
 }
 
 
- async function searchRecipes(query, number, cuisine, diet, intolerances) {
+ async function searchRecipes(req, query, number, cuisine, diet, intolerances) {
 
         let res = await axios.get(`${api_domain}/complexSearch`, {
             params: {
-                // includeNutrition: false,
                 apiKey: process.env.spooncular_apiKey,
                 query: query, 
                 number: number,
                 cuisine: cuisine, 
                 diet: diet,
-                intolerances: intolerances
+                intolerances: intolerances,
+                instructionsRequired: true,
+                addRecipeInformation: true,
             },
         })
-        return res;
+        const dicts = res.data['results'];
+
+        let result_id = "";
+        for(let i = 0; i < Object.keys(dicts).length; i++)
+        {
+            if(i !=  dicts.length - 1)
+                result_id = result_id + dicts[i]['id'] + ", ";
+            else
+                result_id = result_id + dicts[i]['id'];
+        }
+        const recipes_preview = await getRecipesPreview(req, result_id);
+        console.log(recipes_preview)
+        for(let i = 0; i < dicts.length; i++)
+        {
+            recipes_preview[i]['instructions'] = dicts[i]['analyzedInstructions']
+        }
+        return recipes_preview;
 }
 
 

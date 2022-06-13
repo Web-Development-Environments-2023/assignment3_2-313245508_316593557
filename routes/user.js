@@ -47,30 +47,13 @@ router.get('/favorites', async (req,res,next) => {
     let recipes_id_array = [];
     recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
     let recipes_id_str = await recipe_utils.joinList(recipes_id_array);
-    const results = await recipe_utils.getRecipesPreview(user_id, recipes_id_str);
+    const results = await recipe_utils.getRecipesPreview(req, recipes_id_str);
     res.status(200).send(results);
   } catch(error){
     next(error); 
   }
 });
 
-
-async function joinList(recipes_id_array)
-{
-  let recipes_id_str = "";
-  for (var i = 0; i < recipes_id_array.length; i++)
-  {
-    if(i != recipes_id_array.length - 1)
-    {
-      recipes_id_str += recipes_id_array[i] + ",";
-    }
-    else
-    {
-      recipes_id_str += recipes_id_array[i];
-    }
-  }
-  return recipes_id_str
-}
 
 
 
@@ -146,6 +129,22 @@ router.get('/family', async (req,res,next) => {
   }
 });
 
+
+/**
+ * This path returns a full details of a recipe by its id
+ */
+ router.get("/privateRecipes/:recipeId", async (req, res, next) => {
+  try {
+    const recipe = await user_utils.getPrivateRecipeDetails(req.session.user_id , req.params.recipeId);
+    res.send(recipe);
+  } catch (error) {
+    next(error);
+  }
+});
+
+
+
+
 module.exports = router;
 
 
@@ -157,5 +156,6 @@ module.exports = router;
 
 
 
-// 1. check all paths
-// 3. change the Yaml 
+// 1. change the Yaml
+// 2. notes
+// 3. add family recipes

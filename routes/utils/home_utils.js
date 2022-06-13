@@ -1,11 +1,11 @@
 const axios = require("axios");
 const api_domain = "https://api.spoonacular.com/recipes";
+const recipe_utils = require("./recipes_utils");
 
 
 
 
-
-async function getRandomRecipes() {
+async function getRandomRecipes(req) {
     let res = await axios.get(`${api_domain}/random`, {
         params: {
             apiKey: process.env.spooncular_apiKey,
@@ -14,13 +14,13 @@ async function getRandomRecipes() {
     })
 
     let recipes_id_list = [];
-    for (let recipe of res.data)
+    for (let recipe of res.data['recipes'])
     {
         let {id} = recipe
         recipes_id_list.push(id);
     }
-    
-    return await recipe_utils.getRecipesPreview(req.session.user_id, await recipe_utils.joinList(lastWatched)); ;
+
+    return await recipe_utils.getRecipesPreview(req, await recipe_utils.joinList(recipes_id_list)); ;
 }
 
 
