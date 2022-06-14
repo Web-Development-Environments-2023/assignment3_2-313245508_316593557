@@ -34,8 +34,12 @@ router.post('/favorites', async (req,res,next) => {
     const recipe_id = req.body.recipeId;
 
     // Saves that the given user_id has marked the given recipe_id as a favorite recipe
-    await user_utils.markAsFavorite(user_id,recipe_id);
-    res.status(200).send("The Recipe successfully saved as favorite");
+    const result = await user_utils.markAsFavorite(user_id,recipe_id);
+    if(result)
+      res.status(200).send("The recipe successfully saved as favorite");
+    else
+      res.status(201).send("The recipe is already marked as favorite");
+
     } catch(error){
     next(error);
   }
@@ -112,8 +116,15 @@ router.get('/favorites', async (req,res,next) => {
     const user_id = req.session.user_id;
 
     // Creates the recipe and saves it
-    const recipes = await user_utils.createRecipe(amount_of_meals, ingredients, instructions, type_of_food, gluten_free, image, name, popularity, preparation_time, vegan, vegetarian, user_id);
-    res.send(recipes.data);
+    const result = await user_utils.createRecipe(amount_of_meals, ingredients, instructions, type_of_food, gluten_free, image, name, popularity, preparation_time, vegan, vegetarian, user_id);
+    if(result)
+      res.status(200).send("The recipe has been successfully created");
+    else
+      res.status(201).send("The recipe already exist");
+
+
+
+
 } catch (error) {
   next(error);
 }
@@ -147,13 +158,8 @@ router.get('/family', async (req,res,next) => {
     // Extracts the connected user_id
     const user_id = req.session.user_id;
 
-    // Gets the recipes_ids that were saved in the family recipes of the user
-    const recipes_id = await user_utils.getFamilyRecipes(user_id);
-    let recipes_id_array = [];
-    recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
-
-    // Returns the the preview of the recipes
-    const results = await recipe_utils.getRecipesPreview(recipes_id_array);
+    // Gets the recipes that were saved in the family recipes of the user
+    const results = await user_utils.getFamilyRecipes(user_id);
     res.status(200).send(results);
   } catch(error){
     next(error); 
@@ -162,12 +168,12 @@ router.get('/family', async (req,res,next) => {
 
 
 /**
- * This path returns a full details of a recipe by its id
+ * This path returns a full details of a private recipe by its id
  */
  router.get("/privateRecipes/:recipeId", async (req, res, next) => {
   try {
     const recipe = await user_utils.getPrivateRecipeDetails(req.session.user_id , req.params.recipeId);
-    res.send(recipe);
+    res.status(200).send(recipe);
   } catch (error) {
     next(error);
   }
@@ -181,12 +187,4 @@ module.exports = router;
 
 
 
-
-
-
-
-
-
 // 1. change the Yaml
-// 2. notes
-// 3. add family recipes

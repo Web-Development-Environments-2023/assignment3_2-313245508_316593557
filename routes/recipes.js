@@ -5,8 +5,6 @@ const users_utils = require("./utils/user_utils");
 
 
 
-// router.get("/", (req, res) => res.send("im here"));
-
 
 
 /**
@@ -30,7 +28,7 @@ const users_utils = require("./utils/user_utils");
 
     // Searches for the given query
     const recipes = await recipes_utils.searchRecipes(req, query, number, cuisine, diet, intolerances);
-    res.send(recipes);
+    res.status(200).send(recipes);
   } catch (error) {
     next(error);
   }
@@ -61,7 +59,7 @@ router.get("/:recipeId", async (req, res, next) => {
     }
 
     // Sends the response with the recipe's details
-    res.send(recipe);
+    res.status(200).send(recipe);
   } catch (error) {
     next(error);
   }
