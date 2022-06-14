@@ -30,7 +30,7 @@ const users_utils = require("./utils/user_utils");
     const recipes = await recipes_utils.searchRecipes(req, query, number, cuisine, diet, intolerances);
     res.status(200).send(recipes);
   } catch (error) {
-    next(error);
+    res.status(400).send("Wrong input parameters");
   }
 });
 
@@ -61,7 +61,7 @@ router.get("/:recipeId", async (req, res, next) => {
     // Sends the response with the recipe's details
     res.status(200).send(recipe);
   } catch (error) {
-    next(error);
+    res.status(404).send("recipe doesn't exist");
   }
 });
 

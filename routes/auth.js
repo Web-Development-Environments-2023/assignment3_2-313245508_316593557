@@ -44,7 +44,7 @@ router.post("/Register", async (req, res, next) => {
     );
     res.status(201).send({ message: "user created", success: true });
   } catch (error) {
-    next(error);
+    res.status(400).send({ success: false, message: "Wrong input parameters"});
   }
 });
 
@@ -100,18 +100,18 @@ router.post("/Logout", async (req, res) => {
           if (users.find((x) => x.user_id === req.session.user_id)) 
           {
             req.session.reset(); // reset the session info --> send cookie when  req.session == undefined!!
-            res.send({ success: true, message: "logout succeeded" });
+            res.status(200).send({ success: true, message: "logout succeeded" });
           }
       }
       else
       {
-        res.send({ success: false, message: "You can't logout because there is no user logged in"});
+        res.status(201).send({ success: false, message: "You can't logout because there is no user logged in"});
       }
 
     }
     catch (error)
     {
-      res.send({ success: false, message: "An error occured during logout"});
+      res.status(400).send({ success: false, message: "An error occured during logout"});
     }
 });
 

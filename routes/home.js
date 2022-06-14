@@ -35,17 +35,17 @@ const home_utils = require("./utils/home_utils");
             let lst = [];
             lst.push(randomRecipes);
             lst.push(recipesPreview);
-            res.send(lst);
+            res.status(200).send(lst);
           }
       }
       else
       {
-        res.send(randomRecipes);
+        res.status(200).send(randomRecipes);
       }
     }
     catch (error)
     {
-      next(error);
+      res.status(404).send("Home page not found");
     }
   });
 

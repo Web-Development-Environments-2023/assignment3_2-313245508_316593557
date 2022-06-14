@@ -25,7 +25,6 @@ router.use(async function (req, res, next) {
 
 /**
  * This path gets body with recipeId and save this recipe in the favorites list of the logged-in user. Takes the following parameters (in body):
- * user_id - int
  * recipe_id - int
  */
 router.post('/favorites', async (req,res,next) => {
@@ -40,9 +39,10 @@ router.post('/favorites', async (req,res,next) => {
     else
       res.status(201).send("The recipe is already marked as favorite");
 
-    } catch(error){
-    next(error);
-  }
+    } catch(error)
+    {
+      res.status(401).send("user is not authorized");
+    }
 })
 
 /**
@@ -78,7 +78,7 @@ router.get('/favorites', async (req,res,next) => {
     
     
   } catch(error){
-    next(error); 
+    res.status(404).send("error occured")
   }
 });
 
@@ -122,11 +122,9 @@ router.get('/favorites', async (req,res,next) => {
     else
       res.status(201).send("The recipe already exist");
 
-
-
-
 } catch (error) {
-  next(error);
+  res.status(400).send("wrong input parameter");
+
 }
   
 });
@@ -144,7 +142,7 @@ router.get('/private', async (req,res,next) => {
     const results = await recipe_utils.getPrivateRecipesPreview(user_id);
     res.status(200).send(results);
   } catch(error){
-    next(error); 
+    res.status(401).send("user is not authorized");
   }
 
 });
@@ -162,7 +160,7 @@ router.get('/family', async (req,res,next) => {
     const results = await user_utils.getFamilyRecipes(user_id);
     res.status(200).send(results);
   } catch(error){
-    next(error); 
+    res.status(401).send("user not connected");
   }
 });
 
