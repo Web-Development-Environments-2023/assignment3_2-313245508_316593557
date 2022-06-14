@@ -13,7 +13,7 @@ const e = require("express");
  * @param {*} recipes_info 
  */
 
-
+// Function that gets a recipe_id and returns all the recipe's info from the spoonacular API
 async function getRecipeInformation(recipe_id) {
     return await axios.get(`${api_domain}/${recipe_id}/information`, {
         params: {
@@ -24,9 +24,12 @@ async function getRecipeInformation(recipe_id) {
 }
 
 
-
+// Function that gets a recipe_id, calls the spoonacular API to get all the recipe's info, then returns only relevant information
 async function getRecipeDetails(req, recipe_id) {
+    // Gets all the recipe's info
     let recipe_info = await getRecipeInformation(recipe_id);
+
+    // Extract only the relevant information
     let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree, amount_of_meals, ingredients, instructions, type_of_food } = recipe_info.data;
     preview_dict = {
         id: id,
@@ -43,12 +46,14 @@ async function getRecipeDetails(req, recipe_id) {
         glutenFree: glutenFree,
     
     }
+
+    // If there is a connected user - checks if he has watched/saved to favorite the recipe
     if (req.session && req.session.user_id)
     {
         const users = await DButils.execQuery("SELECT user_id FROM users")
         if (users.find((x) => x.user_id === req.session.user_id)) 
         {
-                    // Checks if the user has saved the recipe to his favorite
+            // Checks if the user has saved the recipe to his favorite
             const is_saved_to_favorites = await user_utils.isFavorite(req.session.user_id, id);
             if (is_saved_to_favorites)
             {
@@ -80,12 +85,12 @@ async function getRecipeDetails(req, recipe_id) {
     return preview_dict;
 }
 
-// Function that returns the recipe information of a recipe.
-// @@@@ I dont know why, but it only returns the first recipe when I try to send multiple recipe_ids
+// Function that gets a list of recipe_ids and returns the preview of theses recipes
 async function getRecipesPreview(req, recipes_id_array) 
 {
     try
     {
+        // Calls the spoonacular's API to get all the information about the recipes
         let results = []
         let recipe_info_list =  await axios.get(`${api_domain}/informationBulk`, {
             params: {
@@ -94,8 +99,6 @@ async function getRecipesPreview(req, recipes_id_array)
             }
         })
 
-    console.log(1);
-    
 
     // Loop through all the recipe information that has returned from Spoonacular and extract only the  preview
     for (let recipe_prev of recipe_info_list.data)
@@ -111,17 +114,14 @@ async function getRecipesPreview(req, recipes_id_array)
             glutenFree: glutenFree,
         }
 
-        console.log(2);
-
-
-
+        // Checks if the user is connected - checks if he has watched/saved to favorite the recipe
         if (req.session && req.session.user_id)
         {
   
           const users = await DButils.execQuery("SELECT user_id FROM users")
             if (users.find((x) => x.user_id === req.session.user_id)) 
             {
-                        // Checks if the user has saved the recipe to his favorite
+                // Checks if the user has saved the recipe to his favorite
                 const is_saved_to_favorites = await user_utils.isFavorite(req.session.user_id, id);
                 if (is_saved_to_favorites)
                 {
@@ -132,9 +132,6 @@ async function getRecipesPreview(req, recipes_id_array)
                     preview_dict['favorite'] = false;
                 }
 
-                console.log(3);
-
-
                 // Checks if the recipe has been watched by the user
                 const is_watched = await user_utils.isWatched(req.session.user_id, id);
                 if (is_watched)
@@ -144,11 +141,7 @@ async function getRecipesPreview(req, recipes_id_array)
                 else
                 {
                     preview_dict['watched'] = false;
-                }
-
-                console.log(4);
-
-                        
+                }       
             }
         }
         else
@@ -170,7 +163,7 @@ catch
 }
 
 
-
+// Helper function that receives an array of ids and returns a string of "id1,id2,id3,..."
 async function joinList(recipes_id_array)
 {
   let recipes_id_str = "";
@@ -191,9 +184,10 @@ async function joinList(recipes_id_array)
 
 
 
-// Function that returns the recipe information of a recipe.
+// Function that returns the preview of all the private recipes of a user
 async function getPrivateRecipesPreview(user_id) 
 {
+    // Extracts all the private recipes from the DB
     let results = []
     let recipe_info_list =  await DButils.execQuery(`select * from private_recipes where user_id=${user_id}`);
     if(recipe_info_list == [])
@@ -201,12 +195,9 @@ async function getPrivateRecipesPreview(user_id)
         return results;
     }
     
-    
-    // Loop through all the recipe information that has returned from Spoonacular and extract only the  preview
+    // Loop through all the recipe information that has returned from the DB and arrange the info in a list of dictionnaries
     for (let recipe_prev of recipe_info_list)
-    {
-        console.log(recipe_prev)
-        
+    {        
         let preview_dict =  {
             favorite: recipe_prev['favorite'],
             gluten_free: recipe_prev['gluten_free'],
@@ -224,8 +215,9 @@ async function getPrivateRecipesPreview(user_id)
 }
 
 
+// Function that calls the spoonacular's API to search for recipes according to a given query and preferences parameters
  async function searchRecipes(req, query, number, cuisine, diet, intolerances) {
-
+        // Calls the spoonacular's APi
         let res = await axios.get(`${api_domain}/complexSearch`, {
             params: {
                 apiKey: process.env.spooncular_apiKey,
@@ -238,8 +230,9 @@ async function getPrivateRecipesPreview(user_id)
                 addRecipeInformation: true,
             },
         })
-        const dicts = res.data['results'];
 
+        // Extracts the recipe_ids of the returned recipes
+        const dicts = res.data['results'];
         let result_id = "";
         for(let i = 0; i < Object.keys(dicts).length; i++)
         {
@@ -248,8 +241,11 @@ async function getPrivateRecipesPreview(user_id)
             else
                 result_id = result_id + dicts[i]['id'];
         }
+
+        // Gets the preview of the returned recipes
         const recipes_preview = await getRecipesPreview(req, result_id);
-        console.log(recipes_preview)
+
+        // Adds into the recipes preview the instructions that came back from spoonacular's API
         for(let i = 0; i < dicts.length; i++)
         {
             recipes_preview[i]['instructions'] = dicts[i]['analyzedInstructions']

@@ -1,19 +1,23 @@
 const DButils = require("./DButils");
 
+// Function that inserts into the favorite_recipes table a new row. Used when a connected user saves a recipe as favorite
 async function markAsFavorite(user_id, recipe_id){
     await DButils.execQuery(`insert into favorite_recipes (user_id, recipe_id) values(${user_id},${recipe_id})`);
 }
 
+// Function that returns all the recipe_ids from the favorite_recipes.
 async function getFavoriteRecipes(user_id){
     const recipes_id = await DButils.execQuery(`select recipe_id from favorite_recipes where user_id=${user_id}`);
     return recipes_id;
 }
 
+// Function that returns all the recipe_ids from the private_recipes.
 async function getPrivateRecipes(user_id){
     const recipes_id = await DButils.execQuery(`select recipe_id from private_recipes where user_id=${user_id}`);
     return recipes_id;
 }
 
+// Function that returns all the recipe_ids from the family_recipes.
 async function getFamilyRecipes(user_id){
     const recipes_id = await DButils.execQuery(`select recipe_id, name, recipe_inventor, when_to_make_it, ingredients, instructions, image from family_recipes where user_id='${user_id}'`);
     return recipes_id;
@@ -28,17 +32,16 @@ async function isFavorite(user_id, recipe_id){
     else{
         return false;
     }
-    // return recipes_id;
 }
 
-
+// Function that inserts a new recipe inot the private_recipes table
 async function createRecipe(amount_of_meals, ingredients, instructions, type_of_food, gluten_free, image, name, popularity, preparation_time, vegan, vegetarian, user_id){
     const response = await DButils.execQuery(`insert into private_recipes (user_id, amount_of_meals, ingredients, instructions, type_of_food, favorite, gluten_free, image, name, popularity, preparation_time, vegan, watched, vegetarian) values (${user_id}, '${amount_of_meals}', '${ingredients}', '${instructions}', '${type_of_food}', 0, ${gluten_free}, '${image}', '${name}', ${popularity}, '${preparation_time}', ${vegan}, 0, ${vegetarian})`);
     return response;
 }
 
 
-
+// Function that inserts a new row into the users_watched_recipes. Used when a user watches a full recipe
 async function markAsWatched(user_id, recipe_id) 
 {
     try

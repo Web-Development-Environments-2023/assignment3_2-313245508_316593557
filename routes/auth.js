@@ -1,9 +1,18 @@
 var express = require("express");
 var router = express.Router();
-const MySql = require("../routes/utils/MySql");
+// const MySql = require("../routes/utils/MySql");
 const DButils = require("../routes/utils/DButils");
 const bcrypt = require("bcrypt");
 
+/**
+ * API for registering users to the website. Takes the following parameters (in body):
+ * username - string
+ *  first_name - string
+ * last_name - string
+ * country - string
+ * password - string
+ * email - string
+ *  */ 
 router.post("/Register", async (req, res, next) => {
   try {
     // parameters exists
@@ -17,9 +26,10 @@ router.post("/Register", async (req, res, next) => {
       password: req.body.password,
       email: req.body.email,
     }
+
+    // Checks if username is unique
     let users = [];
     users = await DButils.execQuery("SELECT username from users");
-
     if (users.find((x) => x.username === user_details.username))
       throw { status: 409, message: "Username taken" };
 
@@ -38,11 +48,15 @@ router.post("/Register", async (req, res, next) => {
   }
 });
 
+/**
+ * API for logging in users. Takes the following parameters (in body):
+ * username - string
+ * password - string
+ */
 router.post("/Login", async (req, res, next) => {
-
-
-
   try {
+
+    // Checks if you are already connected
     if (req.session && req.session.user_id)
     {
       res.send({ success: false, status: 201, message: "You can't login because there is already a connected user"});
@@ -60,7 +74,6 @@ router.post("/Login", async (req, res, next) => {
         `SELECT * FROM users WHERE username = '${req.body.username}'`
       )
     )[0];
-
     if (!bcrypt.compareSync(req.body.password, user.password)) {
       throw { status: 401, message: "Username or Password incorrect" };
     }
@@ -75,13 +88,14 @@ router.post("/Login", async (req, res, next) => {
   }
 });
 
+// API that logout a connected user
 router.post("/Logout", async (req, res) => {
 
   try 
     {
+      // Checks that there is user connected
       if (req.session && req.session.user_id)
       {
-
         const users = await DButils.execQuery("SELECT user_id FROM users")
           if (users.find((x) => x.user_id === req.session.user_id)) 
           {

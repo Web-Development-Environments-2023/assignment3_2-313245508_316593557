@@ -24,12 +24,16 @@ router.use(async function (req, res, next) {
 
 
 /**
- * This path gets body with recipeId and save this recipe in the favorites list of the logged-in user
+ * This path gets body with recipeId and save this recipe in the favorites list of the logged-in user. Takes the following parameters (in body):
+ * user_id - int
+ * recipe_id - int
  */
 router.post('/favorites', async (req,res,next) => {
   try{
     const user_id = req.session.user_id;
     const recipe_id = req.body.recipeId;
+
+    // Saves that the given user_id has marked the given recipe_id as a favorite recipe
     await user_utils.markAsFavorite(user_id,recipe_id);
     res.status(200).send("The Recipe successfully saved as favorite");
     } catch(error){
@@ -42,13 +46,33 @@ router.post('/favorites', async (req,res,next) => {
  */
 router.get('/favorites', async (req,res,next) => {
   try{
+    // Check if user is connected
     const user_id = req.session.user_id;
-    const recipes_id = await user_utils.getFavoriteRecipes(user_id);
-    let recipes_id_array = [];
-    recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
-    let recipes_id_str = await recipe_utils.joinList(recipes_id_array);
-    const results = await recipe_utils.getRecipesPreview(req, recipes_id_str);
-    res.status(200).send(results);
+    if (req.session && user_id)
+    {
+      const users = await DButils.execQuery("SELECT user_id FROM users")
+        if (users.find((x) => x.user_id === req.session.user_id)) 
+        {
+
+          // Gets the recipes_ids that were saved as "favorite" by the connected user
+          const recipes_id = await user_utils.getFavoriteRecipes(user_id);
+          let recipes_id_array = [];
+
+          // Extracts the recipe_ids into an array
+          recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); 
+
+          // Casts the recipe_ids to a string with ',' in between and gets the preview of these recipes_ids
+          let recipes_id_str = await recipe_utils.joinList(recipes_id_array);
+          const results = await recipe_utils.getRecipesPreview(req, recipes_id_str);
+          res.status(200).send(results);
+        }
+    }
+    else
+    {
+      res.status(201).send("User is not connected")
+    }
+    
+    
   } catch(error){
     next(error); 
   }
@@ -58,11 +82,22 @@ router.get('/favorites', async (req,res,next) => {
 
 
 /**
- * This path gets body with recipeId and save this recipe in the favorites list of the logged-in user
+ * API that adds a new private recipes for the connected user. Takes the following parameters (body):
+ * amount_of_meals - string
+ * ingredients - string
+ * type_of_food - string
+ * gluten_free - binary int (0/1)
+ * image - string (url of image)
+ * name - string
+ * popularity - int
+ * preparation_time - string
+ * vegan - binary int (0/1)
+ * vegetarian - binary int (0/1)
  */
  router.post('/private', async (req,res,next) => {
   try 
   {
+    // Extracts all the parameters from the body
     const amount_of_meals = req.body.amount_of_meals;
     const ingredients = req.body.ingredients;
     const instructions = req.body.instructions;
@@ -76,6 +111,7 @@ router.get('/favorites', async (req,res,next) => {
     const vegetarian = req.body.vegetarian;
     const user_id = req.session.user_id;
 
+    // Creates the recipe and saves it
     const recipes = await user_utils.createRecipe(amount_of_meals, ingredients, instructions, type_of_food, gluten_free, image, name, popularity, preparation_time, vegan, vegetarian, user_id);
     res.send(recipes.data);
 } catch (error) {
@@ -85,11 +121,15 @@ router.get('/favorites', async (req,res,next) => {
 });
 
 /**
- * This path returns the favorites recipes that were saved by the logged-in user
+ * This path returns the private recipes that were created by the logged-in user
  */
 router.get('/private', async (req,res,next) => {
   try{
+
+    // Extracts the connected user_id
     const user_id = req.session.user_id;
+
+    // Gets the preview of all the recipes that were saved for that user
     const results = await recipe_utils.getPrivateRecipesPreview(user_id);
     res.status(200).send(results);
   } catch(error){
@@ -98,30 +138,21 @@ router.get('/private', async (req,res,next) => {
 
 });
 
-// Function I did only to test the GetRecipe Preview
-router.get('/testGetRecipePreview', async (req,res,next) => {
-  try{
-    const recipeID = req.query.recipeID
-    console.log(typeof recipeID);
-    const results = await recipe_utils.getRecipesPreview(req.session.user_id ,recipeID)
-    res.status(200).send(results)
-  }catch(error){
-    next(error)
-  }
-})
-
-
-
 
 /**
- * This path returns the favorites recipes that were saved by the logged-in user
+ * This path returns the family recipes that were saved by the logged-in user
  */
 router.get('/family', async (req,res,next) => {
   try{
+    // Extracts the connected user_id
     const user_id = req.session.user_id;
+
+    // Gets the recipes_ids that were saved in the family recipes of the user
     const recipes_id = await user_utils.getFamilyRecipes(user_id);
     let recipes_id_array = [];
     recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
+
+    // Returns the the preview of the recipes
     const results = await recipe_utils.getRecipesPreview(recipes_id_array);
     res.status(200).send(results);
   } catch(error){
