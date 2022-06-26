@@ -25,27 +25,50 @@ async function getRecipeInformation(recipe_id) {
 
 
 // Function that gets a recipe_id, calls the spoonacular API to get all the recipe's info, then returns only relevant information
+async function getAnalizedInstructions(recipe_id) 
+{
+    try
+    {
+        // Calls the spoonacular's API to get all the information about the recipes
+        let analyzedInstructions =  await axios.get(`${api_domain}/${recipe_id}/analyzedInstructions`, {
+            params: {
+                apiKey: process.env.spooncular_apiKey
+            }
+        })
+        return analyzedInstructions
+    }
+    catch
+    {
+        console.log("err");
+    }
+}
+
+
+
+// Function that gets a recipe_id, calls the spoonacular API to get all the recipe's info, then returns only relevant information
 async function getRecipeDetails(req, recipe_id) {
     // Gets all the recipe's info
     let recipe_info = await getRecipeInformation(recipe_id);
+    //let analyzedInstructions = await getAnalizedInstructions(recipe_id);
 
     // Extract only the relevant information
-    let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree, amount_of_meals, ingredients, instructions, type_of_food } = recipe_info.data;
+    let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree, servings, extendedIngredients, instructions, type_of_food } = recipe_info.data;
     preview_dict = {
         id: id,
+        // analyzedInstructions: analyzedInstructions,
         title: title,
         readyInMinutes: readyInMinutes,
         image: image,
-        popularity: aggregateLikes,
+        aggregateLikes: aggregateLikes,
         vegan: vegan,
         vegetarian: vegetarian,
-        amount_of_meals: amount_of_meals,
-        ingredients: ingredients,
+        servings: servings,
+        extendedIngredients: extendedIngredients,
         instructions: instructions,
         type_of_food: type_of_food,
         glutenFree: glutenFree,
-    
     }
+
 
     // If there is a connected user - checks if he has watched/saved to favorite the recipe
     if (req.session && req.session.user_id)
@@ -103,12 +126,13 @@ async function getRecipesPreview(req, recipes_id_array)
     // Loop through all the recipe information that has returned from Spoonacular and extract only the  preview
     for (let recipe_prev of recipe_info_list.data)
     {
-        let {id, image, title, preparationMinutes, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_prev
+        let {id, image, title, readyInMinutes, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_prev
         let preview_dict =  {
+            id: id,
             image: image,
             title: title,
-            readyInMinutes: preparationMinutes,
-            popularity: aggregateLikes,
+            readyInMinutes: readyInMinutes,
+            aggregateLikes: aggregateLikes,
             vegan: vegan,
             vegetarian: vegetarian,
             glutenFree: glutenFree,
@@ -260,3 +284,4 @@ exports.searchRecipes = searchRecipes;
 exports.getRecipesPreview = getRecipesPreview;
 exports.getPrivateRecipesPreview = getPrivateRecipesPreview;
 exports.joinList = joinList;
+exports.getAnalizedInstructions = getAnalizedInstructions;
