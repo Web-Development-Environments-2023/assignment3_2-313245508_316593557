@@ -8,7 +8,7 @@ const users_utils = require("./utils/user_utils");
 
 
 /**
- * API that gets a query and some search preferences and returns a list of 5/10/15 recipes according to query - Takes the following parameters (in body):
+ * API that gets a query and some search preferences and returns a list of 5/10/15 recipes according to query - Takes the following parameters (in parameters):
  * query - string
  * number - int (5/10/15 only)
  * cuisine - string from list of cuisines

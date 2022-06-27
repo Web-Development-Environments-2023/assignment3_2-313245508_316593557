@@ -178,6 +178,34 @@ router.get('/family', async (req,res,next) => {
 });
 
 
+// TODO add comments
+router.get("/lastwatched", async (req, res, next) =>{
+  try{
+    console.log("printing req")
+    console.log(req)
+    // Check if user is connected
+    if (req.session && req.session.user_id)
+    {
+      const users = await DButils.execQuery("SELECT user_id FROM users")
+        if (users.find((x) => x.user_id === req.session.user_id)) 
+        {
+          // Gets the 3 last watched recipes id of the connected user
+          req.user_id = req.session.user_id;
+          const lastWatched = await user_utils.getLastWatched(req.session.user_id);
+          
+          // Extract the recipes preview only
+          const recipesPreview = await recipe_utils.getRecipesPreview(req, await recipe_utils.joinList(lastWatched));
+          res.status(200).send(recipesPreview);
+        }
+    }
+  } catch (error)
+  {
+    next(error);
+  }
+});
+  
+
+
 
 
 module.exports = router;
