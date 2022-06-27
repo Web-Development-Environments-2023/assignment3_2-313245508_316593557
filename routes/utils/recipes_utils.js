@@ -24,24 +24,24 @@ async function getRecipeInformation(recipe_id) {
 }
 
 
-// Function that gets a recipe_id, calls the spoonacular API to get all the recipe's info, then returns only relevant information
-async function getAnalizedInstructions(recipe_id) 
-{
-    try
-    {
-        // Calls the spoonacular's API to get all the information about the recipes
-        let analyzedInstructions =  await axios.get(`${api_domain}/${recipe_id}/analyzedInstructions`, {
-            params: {
-                apiKey: process.env.spooncular_apiKey
-            }
-        })
-        return analyzedInstructions
-    }
-    catch
-    {
-        console.log("err");
-    }
-}
+// // Function that gets a recipe_id, calls the spoonacular API to get all the recipe's info, then returns only relevant information
+// async function getAnalizedInstructions(recipe_id) 
+// {
+//     try
+//     {
+//         // Calls the spoonacular's API to get all the information about the recipes
+//         let analyzedInstructions =  await axios.get(`${api_domain}/${recipe_id}/analyzedInstructions`, {
+//             params: {
+//                 apiKey: process.env.spooncular_apiKey
+//             }
+//         })
+//         return analyzedInstructions
+//     }
+//     catch
+//     {
+//         console.log("err");
+//     }
+// }
 
 
 
@@ -52,10 +52,10 @@ async function getRecipeDetails(req, recipe_id) {
     //let analyzedInstructions = await getAnalizedInstructions(recipe_id);
 
     // Extract only the relevant information
-    let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree, servings, extendedIngredients, instructions, type_of_food } = recipe_info.data;
+    let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian,analyzedInstructions, glutenFree, servings, extendedIngredients, instructions, type_of_food } = recipe_info.data;
     preview_dict = {
         id: id,
-        // analyzedInstructions: analyzedInstructions,
+        analyzedInstructions: analyzedInstructions,
         title: title,
         readyInMinutes: readyInMinutes,
         image: image,
@@ -284,4 +284,4 @@ exports.searchRecipes = searchRecipes;
 exports.getRecipesPreview = getRecipesPreview;
 exports.getPrivateRecipesPreview = getPrivateRecipesPreview;
 exports.joinList = joinList;
-exports.getAnalizedInstructions = getAnalizedInstructions;
+// exports.getAnalizedInstructions = getAnalizedInstructions;
