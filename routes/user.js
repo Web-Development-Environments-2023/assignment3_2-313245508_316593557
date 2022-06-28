@@ -105,18 +105,17 @@ router.get('/favorites', async (req,res,next) => {
     const amount_of_meals = req.body.amount_of_meals;
     const ingredients = req.body.ingredients;
     const instructions = req.body.instructions;
-    const type_of_food = req.body.type_of_food;
     const gluten_free = req.body.gluten_free;
     const image = req.body.image;
     const name = req.body.name;
-    const popularity = req.body.popularity;
+    const popularity = 0;
     const preparation_time = req.body.preparation_time;
     const vegan = req.body.vegan;
     const vegetarian = req.body.vegetarian;
     const user_id = req.session.user_id;
 
     // Creates the recipe and saves it
-    const result = await user_utils.createRecipe(amount_of_meals, ingredients, instructions, type_of_food, gluten_free, image, name, popularity, preparation_time, vegan, vegetarian, user_id);
+    const result = await user_utils.createRecipe(amount_of_meals, ingredients, instructions, gluten_free, image, name, popularity, preparation_time, vegan, vegetarian, user_id);
     if(result)
       res.status(200).send("The recipe has been successfully created");
     else
