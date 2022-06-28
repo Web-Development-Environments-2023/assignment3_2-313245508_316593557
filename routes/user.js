@@ -137,7 +137,7 @@ router.get('/favorites', async (req,res,next) => {
  */
 router.get('/private', async (req,res,next) => {
   try{
-
+    console.log(req.session)
     // Extracts the connected user_id
     const user_id = req.session.user_id;
 
@@ -184,8 +184,6 @@ router.get('/family', async (req,res,next) => {
 // TODO add comments
 router.get("/lastwatched", async (req, res, next) =>{
   try{
-    console.log("printing req")
-    console.log(req)
     // Check if user is connected
     if (req.session && req.session.user_id)
     {

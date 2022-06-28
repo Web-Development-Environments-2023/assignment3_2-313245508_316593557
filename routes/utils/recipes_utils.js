@@ -226,12 +226,13 @@ async function getPrivateRecipesPreview(user_id)
             favorite: recipe_prev['favorite'],
             gluten_free: recipe_prev['gluten_free'],
             image: recipe_prev['image'],
-            name: recipe_prev['name'],
-            popularity: recipe_prev['popularity'],
-            preparation_time: recipe_prev['preparation_time'],
+            title: recipe_prev['name'],
+            aggregateLikes: recipe_prev['popularity'],
+            readyInMinutes: recipe_prev['preparation_time'],
             vegan: recipe_prev['vegan'],
             watched: recipe_prev['watched'],
             vegetarian: recipe_prev['vegetarian'],
+            id: recipe_prev['recipe_id']
         }
         results.push(preview_dict);
     }
