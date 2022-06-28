@@ -4,6 +4,7 @@ const recipe_utils = require("./recipes_utils");
 
 // Function that calls spoonacular's API to get 3 random recipes
 async function getRandomRecipes(req) {
+
     let res = await axios.get(`${api_domain}/random`, {
         params: {
             apiKey: process.env.spooncular_apiKey,

@@ -126,9 +126,6 @@ async function getLastSearched(user_id)
     try
     {
         const lastSearched = await DButils.execQuery(`select query from users_searched_queries where user_id=${user_id} order by row_index desc limit 1`);
-        console.log(lastSearched)
-        console.log(user_id)
-        console.log(lastSearched[0]["query"])
         return lastSearched[0]["query"];
     }
     catch

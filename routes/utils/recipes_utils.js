@@ -24,26 +24,6 @@ async function getRecipeInformation(recipe_id) {
 }
 
 
-// // Function that gets a recipe_id, calls the spoonacular API to get all the recipe's info, then returns only relevant information
-// async function getAnalizedInstructions(recipe_id) 
-// {
-//     try
-//     {
-//         // Calls the spoonacular's API to get all the information about the recipes
-//         let analyzedInstructions =  await axios.get(`${api_domain}/${recipe_id}/analyzedInstructions`, {
-//             params: {
-//                 apiKey: process.env.spooncular_apiKey
-//             }
-//         })
-//         return analyzedInstructions
-//     }
-//     catch
-//     {
-//         console.log("err");
-//     }
-// }
-
-
 
 // Function that gets a recipe_id, calls the spoonacular API to get all the recipe's info, then returns only relevant information
 async function getRecipeDetails(req, recipe_id) {
