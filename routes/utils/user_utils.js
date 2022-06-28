@@ -120,6 +120,23 @@ async function getLastWatched(user_id)
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////
+async function getLastSearched(user_id)
+{
+    try
+    {
+        const lastSearched = await DButils.execQuery(`select query from users_searched_queries where user_id=${user_id} order by row_index desc limit 1`);
+        console.log(lastSearched)
+        console.log(user_id)
+        console.log(lastSearched[0]["query"])
+        return lastSearched[0]["query"];
+    }
+    catch
+    {
+        return;
+    }
+}
+
 // Function that checks if a user watched the recipe
 async function isWatched(user_id, recipe_id){
     try
@@ -184,4 +201,7 @@ exports.getLastWatched = getLastWatched;
 exports.isWatched = isWatched;
 exports.addQuerySearchedByUser = addQuerySearchedByUser;
 exports.getPrivateRecipeDetails = getPrivateRecipeDetails;
+exports.getLastSearched = getLastSearched;
+
+
 

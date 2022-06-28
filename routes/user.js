@@ -4,25 +4,30 @@ const DButils = require("./utils/DButils");
 const user_utils = require("./utils/user_utils");
 const recipe_utils = require("./utils/recipes_utils");
 
-// /**
-//  * Authenticate all incoming requests by middleware
-//  */
-// router.use(async function (req, res, next) {
-//   if (req.session && req.session.user_id) {
+/**
+ * Authenticate all incoming requests by middleware
+ */
+router.use(async function (req, res, next) {
+  if(Object.keys(req.session).length === 0)
+  {
+    res.sendStatus(401);
+  }
 
-//     DButils.execQuery("SELECT user_id FROM users").then((users) => {
-//       if (users.find((x) => x.user_id === req.session.user_id)) {
+  if (req.session && req.session.user_id) {
 
-//         req.user_id = req.session.user_id;
-//         next();
-//       }
-//     }).catch(err => next(err));
-//   } 
-//   else 
-//   {
-//     res.sendStatus(401);
-//   }
-// });
+    DButils.execQuery("SELECT user_id FROM users").then((users) => {
+      if (users.find((x) => x.user_id === req.session.user_id)) {
+
+        req.user_id = req.session.user_id;
+        next();
+      }
+    }).catch(err => next(err));
+  } 
+  else 
+  {
+    res.sendStatus(401);
+  }
+});
 
 
 /**
@@ -197,6 +202,30 @@ router.get("/lastwatched", async (req, res, next) =>{
           // Extract the recipes preview only
           const recipesPreview = await recipe_utils.getRecipesPreview(req, await recipe_utils.joinList(lastWatched));
           res.status(200).send(recipesPreview);
+        }
+    }
+  } catch (error)
+  {
+    next(error);
+  }
+});
+
+
+router.get("/lastSearched", async (req, res, next) =>{
+  try{
+    // Check if user is connected
+    if (req.session && req.session.user_id)
+    {
+      const users = await DButils.execQuery("SELECT user_id FROM users")
+        if (users.find((x) => x.user_id === req.session.user_id)) 
+        {
+          // Gets the 3 last watched recipes id of the connected user
+          req.user_id = req.session.user_id;
+          const lastSearched = await user_utils.getLastSearched(req.session.user_id);
+          let resList = []
+          resList.push(lastSearched)
+          // Extract the recipes preview only
+          res.status(200).send(resList);
         }
     }
   } catch (error)
