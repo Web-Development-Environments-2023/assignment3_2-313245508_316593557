@@ -4,23 +4,25 @@ const DButils = require("./utils/DButils");
 const user_utils = require("./utils/user_utils");
 const recipe_utils = require("./utils/recipes_utils");
 
-/**
- * Authenticate all incoming requests by middleware
- */
-router.use(async function (req, res, next) {
-  if (req.session && req.session.user_id) {
+// /**
+//  * Authenticate all incoming requests by middleware
+//  */
+// router.use(async function (req, res, next) {
+//   if (req.session && req.session.user_id) {
 
-    DButils.execQuery("SELECT user_id FROM users").then((users) => {
-      if (users.find((x) => x.user_id === req.session.user_id)) {
+//     DButils.execQuery("SELECT user_id FROM users").then((users) => {
+//       if (users.find((x) => x.user_id === req.session.user_id)) {
 
-        req.user_id = req.session.user_id;
-        next();
-      }
-    }).catch(err => next(err));
-  } else {
-    res.sendStatus(401);
-  }
-});
+//         req.user_id = req.session.user_id;
+//         next();
+//       }
+//     }).catch(err => next(err));
+//   } 
+//   else 
+//   {
+//     res.sendStatus(401);
+//   }
+// });
 
 
 /**
@@ -108,14 +110,16 @@ router.get('/favorites', async (req,res,next) => {
     const gluten_free = req.body.gluten_free;
     const image = req.body.image;
     const name = req.body.name;
-    const popularity = 0;
     const preparation_time = req.body.preparation_time;
     const vegan = req.body.vegan;
     const vegetarian = req.body.vegetarian;
     const user_id = req.session.user_id;
+   // const user_id = 6;
+
+
 
     // Creates the recipe and saves it
-    const result = await user_utils.createRecipe(amount_of_meals, ingredients, instructions, gluten_free, image, name, popularity, preparation_time, vegan, vegetarian, user_id);
+    const result = await user_utils.createRecipe(amount_of_meals, ingredients, instructions, gluten_free, image, name, preparation_time, vegan, vegetarian, user_id);
     if(result)
       res.status(200).send("The recipe has been successfully created");
     else

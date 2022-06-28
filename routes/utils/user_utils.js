@@ -74,10 +74,10 @@ async function isFavorite(user_id, recipe_id)
 }
 
 // Function that inserts a new recipe inot the private_recipes table
-async function createRecipe(amount_of_meals, ingredients, instructions, gluten_free, image, name, popularity, preparation_time, vegan, vegetarian, user_id){
+async function createRecipe(amount_of_meals, ingredients, instructions, gluten_free, image, name, preparation_time, vegan, vegetarian, user_id){
     try
     {
-        const response = await DButils.execQuery(`insert into private_recipes (user_id, amount_of_meals, ingredients, instructions, favorite, gluten_free, image, name, popularity, preparation_time, vegan, watched, vegetarian) values (${user_id}, '${amount_of_meals}', '${ingredients}', '${instructions}', '${type_of_food}', 0, ${gluten_free}, '${image}', '${name}', ${popularity}, '${preparation_time}', ${vegan}, 0, ${vegetarian})`);
+        const response = await DButils.execQuery(`insert into private_recipes (user_id, amount_of_meals, ingredients, instructions, favorite, gluten_free, image, name, popularity, preparation_time, vegan, watched, vegetarian) values (${user_id}, '${amount_of_meals}', '${ingredients}', '${instructions}', 0, ${gluten_free}, '${image}', '${name}', 0, '${preparation_time}', ${vegan}, 0, ${vegetarian})`);
         return true;
     }
     catch
@@ -165,7 +165,7 @@ async function addQuerySearchedByUser(session, query)
 // Function that checks if a user watched the recipe
 async function getPrivateRecipeDetails(user_id, recipe_id)
 {
-    const columns = "recipe_id, name, preparation_time, image, popularity, vegan, vegetarian, amount_of_meals, ingredients, instructions, type_of_food, gluten_free, favorite, watched";
+    const columns = "recipe_id, name, preparation_time, image, popularity, vegan, vegetarian, amount_of_meals, ingredients, instructions, gluten_free, favorite, watched";
     const recipe_details = await DButils.execQuery(`select ` + columns + ` from private_recipes where user_id=${user_id} and recipe_id=${recipe_id}`);
     return recipe_details;
 }
