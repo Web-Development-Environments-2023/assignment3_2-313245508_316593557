@@ -11,6 +11,7 @@ router.use(async function (req, res, next) {
   if(Object.keys(req.session).length === 0)
   {
     res.sendStatus(401);
+    return;
   }
 
   if (req.session && req.session.user_id) {
@@ -57,6 +58,7 @@ router.post('/favorites', async (req,res,next) => {
  */
 router.get('/favorites', async (req,res,next) => {
   try{
+    
     // Check if user is connected
     const user_id = req.session.user_id;
     if (req.session && user_id)
@@ -65,9 +67,12 @@ router.get('/favorites', async (req,res,next) => {
         if (users.find((x) => x.user_id === req.session.user_id)) 
         {
 
+
+
           // Gets the recipes_ids that were saved as "favorite" by the connected user
           const recipes_id = await user_utils.getFavoriteRecipes(user_id);
           let recipes_id_array = [];
+         
 
           // Extracts the recipe_ids into an array
           recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); 
@@ -75,6 +80,8 @@ router.get('/favorites', async (req,res,next) => {
           // Casts the recipe_ids to a string with ',' in between and gets the preview of these recipes_ids
           let recipes_id_str = await recipe_utils.joinList(recipes_id_array);
           const results = await recipe_utils.getRecipesPreview(req, recipes_id_str);
+          console.log(4)
+          console.log(results) //TODO check this and remove this after it is OK @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
           res.status(200).send(results);
         }
     }
@@ -164,8 +171,10 @@ router.get('/family', async (req,res,next) => {
     // Extracts the connected user_id
     const user_id = req.session.user_id;
 
+
     // Gets the recipes that were saved in the family recipes of the user
     const results = await user_utils.getFamilyRecipes(user_id);
+    console``
     res.status(200).send(results);
   } catch(error){
     res.status(401).send("user not connected");
