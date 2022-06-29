@@ -50,7 +50,6 @@ router.get("/:recipeId", async (req, res, next) => {
       const users = await DButils.execQuery("SELECT user_id FROM users")
         if (users.find((x) => x.user_id === req.session.user_id)) 
         {
-
           // Save that the connected user has watched the recipe
           await users_utils.markAsWatched(req.session.user_id, req.params.recipeId);
         }
