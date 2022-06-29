@@ -42,7 +42,7 @@ router.post("/Register", async (req, res, next) => {
       `INSERT INTO users (username, first_name, last_name, country, password, email) VALUES ('${user_details.username}', '${user_details.first_name}', '${user_details.last_name}',
       '${user_details.country}', '${hash_password}', '${user_details.email}')`
     );
-    res.status(201).send({ message: "user created", success: true });
+    res.status(200).send({ message: "user created", success: true });
   } catch (error) {
     res.status(400).send({ success: false, message: "Wrong input parameters"});
   }

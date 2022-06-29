@@ -103,66 +103,65 @@ async function getRecipesPreview(req, recipes_id_array)
         })
 
 
-    // Loop through all the recipe information that has returned from Spoonacular and extract only the  preview
-    for (let recipe_prev of recipe_info_list.data)
-    {
-        let {id, image, title, readyInMinutes, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_prev
-        let preview_dict =  {
-            id: id,
-            image: image,
-            title: title,
-            readyInMinutes: readyInMinutes,
-            aggregateLikes: aggregateLikes,
-            vegan: vegan,
-            vegetarian: vegetarian,
-            glutenFree: glutenFree,
-        }
-
-        // Checks if the user is connected - checks if he has watched/saved to favorite the recipe
-        if (req.session && req.session.user_id)
+        // Loop through all the recipe information that has returned from Spoonacular and extract only the  preview
+        for (let recipe_prev of recipe_info_list.data)
         {
-  
-          const users = await DButils.execQuery("SELECT user_id FROM users")
-            if (users.find((x) => x.user_id === req.session.user_id)) 
-            {
-                // Checks if the user has saved the recipe to his favorite
-                const is_saved_to_favorites = await user_utils.isFavorite(req.session.user_id, id);
-                if (is_saved_to_favorites)
-                {
-                    preview_dict['favorite'] = true;
-                }
-                else
-                {
-                    preview_dict['favorite'] = false;
-                }
-
-                // Checks if the recipe has been watched by the user
-                const is_watched = await user_utils.isWatched(req.session.user_id, id);
-                if (is_watched)
-                {
-                    preview_dict['watched'] = true;
-                }
-                else
-                {
-                    preview_dict['watched'] = false;
-                }       
+            let {id, image, title, readyInMinutes, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_prev
+            let preview_dict =  {
+                id: id,
+                image: image,
+                title: title,
+                readyInMinutes: readyInMinutes,
+                aggregateLikes: aggregateLikes,
+                vegan: vegan,
+                vegetarian: vegetarian,
+                glutenFree: glutenFree,
             }
-        }
-        else
-        {
-            preview_dict['watched'] = false;
-            preview_dict['favorite'] = false;
-        }
 
-        // Adds the preview dictionnary to the result array
-        results.push(preview_dict)
+            // Checks if the user is connected - checks if he has watched/saved to favorite the recipe
+            if (req.session && req.session.user_id)
+            {
+            const users = await DButils.execQuery("SELECT user_id FROM users")
+                if (users.find((x) => x.user_id === req.session.user_id)) 
+                {
+                    // Checks if the user has saved the recipe to his favorite
+                    const is_saved_to_favorites = await user_utils.isFavorite(req.session.user_id, id);
+                    if (is_saved_to_favorites)
+                    {
+                        preview_dict['favorite'] = true;
+                    }
+                    else
+                    {   
+                        preview_dict['favorite'] = false;
+                    }
+
+                    // Checks if the recipe has been watched by the user
+                    const is_watched = await user_utils.isWatched(req.session.user_id, id);
+                    if (is_watched)
+                    {
+                        preview_dict['watched'] = true;
+                    }
+                    else
+                    {
+                        preview_dict['watched'] = false;
+                    }       
+                }
+            }
+            else
+            {
+                preview_dict['watched'] = false;
+                preview_dict['favorite'] = false;
+            }
+
+            // Adds the preview dictionnary to the result array
+            results.push(preview_dict)
+        }
+        return results
     }
-    return results
-}
-catch
-{
-    console.log("err");
-}
+    catch
+    {
+        console.log("err");
+    }
 
 }
 

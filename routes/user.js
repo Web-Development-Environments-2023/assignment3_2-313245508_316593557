@@ -40,8 +40,6 @@ router.post('/favorites', async (req,res,next) => {
     const user_id = req.session.user_id;
     const recipe_id = req.body.recipeId;
 
-    console.log(user_id)
-    console.log(recipe_id)
 
     // Saves that the given user_id has marked the given recipe_id as a favorite recipe
     const result = await user_utils.markAsFavorite(user_id,recipe_id);
@@ -66,11 +64,13 @@ router.get('/favorites', async (req,res,next) => {
     if (req.session && user_id)
     {
       const users = await DButils.execQuery("SELECT user_id FROM users")
+
         if (users.find((x) => x.user_id === req.session.user_id)) 
         {
-
+          
           // Gets the recipes_ids that were saved as "favorite" by the connected user
           const recipes_id = await user_utils.getFavoriteRecipes(user_id);
+
           let recipes_id_array = [];
 
           // Extracts the recipe_ids into an array
@@ -78,15 +78,16 @@ router.get('/favorites', async (req,res,next) => {
 
           // Casts the recipe_ids to a string with ',' in between and gets the preview of these recipes_ids
           let recipes_id_str = await recipe_utils.joinList(recipes_id_array);
+
           const results = await recipe_utils.getRecipesPreview(req, recipes_id_str);
+
           res.status(200).send(results);
         }
-    }
     else
     {
       res.status(201).send("User is not connected")
     }
-    
+  } 
     
   } catch(error){
     res.status(404).send("error occured")
