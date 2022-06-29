@@ -40,6 +40,9 @@ router.post('/favorites', async (req,res,next) => {
     const user_id = req.session.user_id;
     const recipe_id = req.body.recipeId;
 
+    console.log(user_id)
+    console.log(recipe_id)
+
     // Saves that the given user_id has marked the given recipe_id as a favorite recipe
     const result = await user_utils.markAsFavorite(user_id,recipe_id);
     if(result)
