@@ -103,28 +103,8 @@ async function getRecipesPreview(req, recipes_id_array)
         })
 
 
-<<<<<<< HEAD
-    // Loop through all the recipe information that has returned from Spoonacular and extract only the preview
-    for (let recipe_prev of recipe_info_list.data)
-    {
-        let {id, image, title, readyInMinutes, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_prev
-        let preview_dict =  {
-            id: id,
-            image: image,
-            title: title,
-            readyInMinutes: readyInMinutes,
-            aggregateLikes: aggregateLikes,
-            vegan: vegan,
-            vegetarian: vegetarian,
-            glutenFree: glutenFree,
-        }
-
-        // Checks if the user is connected - checks if he has watched/saved to favorite the recipe
-        if (req.session && req.session.user_id)
-=======
         // Loop through all the recipe information that has returned from Spoonacular and extract only the  preview
         for (let recipe_prev of recipe_info_list.data)
->>>>>>> 61f4de1058250e1437220ef8e248ed76d4bb47cd
         {
             let {id, image, title, readyInMinutes, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_prev
             let preview_dict =  {

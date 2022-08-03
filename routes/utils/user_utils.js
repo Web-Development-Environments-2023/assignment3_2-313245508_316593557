@@ -58,14 +58,9 @@ async function isFavorite(user_id, recipe_id)
 {
     try
     {
-
-
         const count_of_recipes = await DButils.execQuery(`select count(*) from favorite_recipes where user_id=${user_id} and recipe_id=${recipe_id}`);
-<<<<<<< HEAD
-        if (count_of_recipes[0]["count(*)"] != 0){
-=======
-        if (count_of_recipes[0]['count(*)'] > 0){
->>>>>>> 61f4de1058250e1437220ef8e248ed76d4bb47cd
+        if (count_of_recipes[0]["count(*)"] != 0)
+        {
             return true;
         }
         else{
