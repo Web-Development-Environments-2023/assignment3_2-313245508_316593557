@@ -45,6 +45,7 @@ router.get("/:recipeId", async (req, res, next) => {
     // Gets the recipes details by using spoonacular's API
     const recipe = await recipes_utils.getRecipeDetails(req, req.params.recipeId);
 
+<<<<<<< HEAD
     
     // // Check if user is connected
     // if (req.session && req.session.user_id)
@@ -63,6 +64,14 @@ router.get("/:recipeId", async (req, res, next) => {
         {
           await users_utils.markAsWatched(req.session.user_id, req.params.recipeId);
         }
+=======
+    // Check if user is connected
+    if (req.session && req.session.user_id)
+    {
+      // Save that the connected user has watched the recipe
+      await users_utils.markAsWatched(req.session.user_id, req.params.recipeId);
+    }
+>>>>>>> 61f4de1058250e1437220ef8e248ed76d4bb47cd
 
     // Sends the response with the recipe's details
     res.status(200).send(recipe);
