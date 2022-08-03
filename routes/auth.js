@@ -44,7 +44,7 @@ router.post("/Register", async (req, res, next) => {
     );
     res.status(201).send({ message: "user created", success: true });
   } catch (error) {
-    res.status(400).send({ success: false, message: "Wrong input parameters"});
+    res.status(400).send({ success: false, message: "This Username is already taken"});
   }
 });
 

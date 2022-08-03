@@ -103,7 +103,7 @@ async function getRecipesPreview(req, recipes_id_array)
         })
 
 
-    // Loop through all the recipe information that has returned from Spoonacular and extract only the  preview
+    // Loop through all the recipe information that has returned from Spoonacular and extract only the preview
     for (let recipe_prev of recipe_info_list.data)
     {
         let {id, image, title, readyInMinutes, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_prev

@@ -44,16 +44,25 @@ router.get("/:recipeId", async (req, res, next) => {
 
     // Gets the recipes details by using spoonacular's API
     const recipe = await recipes_utils.getRecipeDetails(req, req.params.recipeId);
-    // Check if user is connected
-    if (req.session && req.session.user_id)
-    {
-      const users = await DButils.execQuery("SELECT user_id FROM users")
-        if (users.find((x) => x.user_id === req.session.user_id)) 
+
+    
+    // // Check if user is connected
+    // if (req.session && req.session.user_id)
+    // {
+    //   const users = await DButils.execQuery("SELECT user_id FROM users") //////////////////////////////////////////////////////////////
+
+    //     if (users.find((x) => x.user_id === req.session.user_id)) 
+    //     {
+    //       //Save that the connected user has watched the recipe
+    //       await users_utils.markAsWatched(req.session.user_id, req.params.recipeId);
+    //     }
+    // }
+
+        // Check if user is connected
+        if (req.session && req.session.user_id)
         {
-          // Save that the connected user has watched the recipe
           await users_utils.markAsWatched(req.session.user_id, req.params.recipeId);
         }
-    }
 
     // Sends the response with the recipe's details
     res.status(200).send(recipe);
