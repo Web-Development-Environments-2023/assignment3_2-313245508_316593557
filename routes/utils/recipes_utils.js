@@ -206,6 +206,8 @@ async function getPrivateRecipesPreview(user_id)
             gluten_free: recipe_prev['gluten_free'],
             image: recipe_prev['image'],
             title: recipe_prev['name'],
+            instructions: recipe_prev['instructions'],
+            ingredients: recipe_prev['ingredients'],
             aggregateLikes: recipe_prev['popularity'],
             readyInMinutes: recipe_prev['preparation_time'],
             vegan: recipe_prev['vegan'],
