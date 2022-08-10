@@ -32,13 +32,6 @@ const home_utils = require("./utils/home_utils");
 
 
 
-  /**
- * This path returns the about page
- */
- router.get("/about", async (req, res, next) => {
-
-  });
-
 
 
 

@@ -123,7 +123,6 @@ router.get('/favorites', async (req,res,next) => {
     const vegan = req.body.vegan;
     const vegetarian = req.body.vegetarian;
     const user_id = req.session.user_id;
-   // const user_id = 6;
 
 
 
@@ -176,17 +175,17 @@ router.get('/family', async (req,res,next) => {
 });
 
 
-/**
- * This path returns a full details of a private recipe by its id
- */
- router.get("/privateRecipes/:recipeId", async (req, res, next) => {
-  try {
-    const recipe = await user_utils.getPrivateRecipeDetails(req.session.user_id , req.params.recipeId);
-    res.status(200).send(recipe);
-  } catch (error) {
-    next(error);
-  }
-});
+// /**
+//  * This path returns a full details of a private recipe by its id
+//  */
+//  router.get("/privateRecipes/:recipeId", async (req, res, next) => {
+//   try {
+//     const recipe = await user_utils.getPrivateRecipeDetails(req.session.user_id , req.params.recipeId);
+//     res.status(200).send(recipe);
+//   } catch (error) {
+//     next(error);
+//   }
+// });
 
 
 // TODO add comments
