@@ -1,8 +1,8 @@
 ---
 openapi: 3.0.0
 info:
-  title: Simple Inventory API
-  description: This is a simple API
+  title: RecipeHub API
+  description: This is the API for our recipes website
   contact:
     email: amitelb@post.bgu.ac.il
   license:
@@ -79,36 +79,18 @@ paths:
       description: Gets user details and sends a register request to the server
       operationId: register
       requestBody:
-        description: Username and password to connect to the website
+        description: User's First and Last Name, Country, Email, Username, Password
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/registerDetails'
       responses:
-        "201":
+        "200":
           description: Registered successfully
         "400":
           description: Wrong input parameters
         "409":
           description: The provided UserID already exists
-  /about:
-    get:
-      tags:
-      - home
-      summary: about page
-      description: |
-        Displays the about page of the website
-      responses:
-        "200":
-          description: About page loaded successfully.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/aboutObject'
-        "404":
-          description: About page not found.
   /recipes/search:
     get:
       tags:
@@ -117,14 +99,35 @@ paths:
       description: Gets a recipe's name and the number of recipes to look for. Returns the matching recipes.
       parameters:
       - name: query
-        in: path
+        in: query
         description: The query and the number of result to show separated by '='. number of result              is 5/10/15
         required: true
-        style: simple
-        explode: false
         schema:
           type: string
-        example: humus=5
+      - name: number
+        in: query
+        description: The number of result to display. Default is 5. Options are 5/10/15
+        required: false
+        schema:
+          type: int
+      - name: diet
+        in: query
+        description: The type of diet of the searched recipes
+        required: false
+        schema:
+          type: array
+      - name: cuisine
+        in: query
+        description: The type of cuisine of the searched recipes
+        required: false
+        schema:
+          type: array
+      - name: intolerances
+        in: query
+        description: The type of intolerances of the searched recipes
+        required: false
+        schema:
+          type: array
       responses:
         "200":
           description: displays the result recipes from the query
@@ -141,8 +144,6 @@ paths:
         in: path
         description: id of the recipe
         required: true
-        style: simple
-        explode: false
         schema:
           type: integer
       responses:
@@ -155,8 +156,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/recipe'
         "404":
-          description: recipe doesn't exist
-  
+          description: recipe doesn't exist 
   /users/favorites:
     get:
       tags:
@@ -189,11 +189,11 @@ paths:
               properties:
                 reciepeId:
                   type: integer
-                  description: reciepe's id which the user saved
+                  description: recipe's id which the user saved
                   example: 12351
       responses:
         "200":
-          description: The Recipe successfully saved as favorite
+          description: The recipe successfully saved as favorite
         "201":
           description: The recipe is already marked as favorite
         "401":
@@ -252,7 +252,35 @@ paths:
                   $ref: '#/components/schemas/recipePreview'
         "401":
           description: user not connected
-   
+  /users/lastwatched:
+    get:
+      tags:
+      - users
+      summary: shows the 3 last watched recipes
+      description: retrieves the recipe preview of the 3 last recipes that have been watched
+      response:
+      "200":
+        description: last watched recipes
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/recipePreview'
+  /users/lastSearched:
+    get:
+      tags:
+      - users
+      summary: shows the last searched recipe
+      description: retrieves the last searched recipe of the currently connected user
+      response:
+      "200":
+        description: last searched recipe
+        content:
+          application/json:
+            schema:
+              type: string
+  
 components:
   schemas:
     loginDetails:
